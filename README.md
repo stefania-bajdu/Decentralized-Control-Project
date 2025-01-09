@@ -1,0 +1,5 @@
+- `model.py` : just simulates the model of the fixed wing UAV
+- `main.py` : simulates the model, saves the data and then plots the model's response
+- `mpc.py` : WIP for the UAV trajectory tracking MPC
+- `flatness.py` : the script that generates the trajectory with the waypoints
+- `utils.py` : utilitary functions to help save the data to mat files for easier ploting
