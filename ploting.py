@@ -1,9 +1,8 @@
-from model import Model
 import matplotlib.pyplot as plt
 from utils import *
 
 
-def plot_results(time, states):
+def plot_UAV_states(time, states):
     """
     Plot the simulation results (x, y, psi).
 
@@ -14,34 +13,51 @@ def plot_results(time, states):
     padding = 4
 
     plt.figure(figsize=figsize)
+    for i, (label, unit) in enumerate(zip(["x", "y", r"$\psi$"], ["(m)", "(m)", "(rad)"])):
+        plt.subplot(3, 1, i + 1)
+        plt.plot(time, states[i, :], label=label)
+        plt.legend()
+        plt.ylabel(f"{label} {unit}")
+        plt.grid(True)
 
-    # Plot x position
-    plt.subplot(3, 1, 1)
-    plt.plot(time, states[0, :], label='x')
-    plt.legend()
-    plt.ylabel('x (m)')
-    plt.grid(True)
-
-    # Plot y position
-    plt.subplot(3, 1, 2)
-    plt.plot(time, states[1, :], label='y')
-    plt.legend()
-    plt.ylabel('y (m)')
-    plt.grid(True)
-
-    # Plot yaw (psi)
-    plt.subplot(3, 1, 3)
-    plt.plot(time, states[2, :], label=r'$\psi$')
-    plt.legend()
-    plt.ylabel('Yaw (rad)')
-    plt.xlabel('Time (s)')
-    plt.grid(True)
-
-    # Adjust layout and display
     plt.tight_layout(pad=padding)
     plt.suptitle("UAV States", fontsize=16)
     plt.show()
 
 
-time, states = read_from_mat("states.mat")
-plot_results(time, states)
+def plot_states_with_references(time, xsim, usim, xref, uref):
+    figsize = (12, 6)
+    padding = 2.5
+
+    # Plot states
+    plt.figure(figsize=figsize)
+    for i, (label, unit) in enumerate(zip(["x", "y", r"$\psi$"], ["(m)", "(m)", "(rad)"])):
+        plt.subplot(3, 1, i + 1)
+        plt.plot(time, xsim[i, :-1], label=label)
+        plt.plot(time, xref[i, :], "--r", label=f"{label}_ref")
+        plt.legend()
+        plt.ylabel(f"{label} {unit}")
+        plt.xlabel(f"Time (s)")
+        plt.grid(True)
+
+    plt.tight_layout(pad=padding)
+    plt.suptitle("States", fontsize=16)
+
+    # Plot control inputs
+    plt.figure(figsize=figsize)
+    for i, (label, unit) in enumerate(zip([r"$v_a$", r"$\phi$"], ["(m/s)", "(rad)"])):
+        plt.subplot(2, 1, i + 1)
+        plt.plot(time, usim[i, :], label=label)
+        plt.plot(time, uref[i, :], "--r", label=f"{label}_ref")
+        plt.legend()
+        plt.ylabel(f"{label} {unit}")
+        plt.xlabel(f"Time (s)")
+        plt.grid(True)
+
+    plt.tight_layout(pad=padding)
+    plt.suptitle("Commands", fontsize=16)
+    plt.show()
+
+
+# time, states = read_from_mat("states.mat")
+# plot_results(time, states)

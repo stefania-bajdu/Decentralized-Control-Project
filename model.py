@@ -22,7 +22,7 @@ class Model:
 
         :return: State derivatives [x_dot, y_dot, psi_dot].
         """
-        psi = state[2]  
+        psi = state[2]
         return np.array([va * np.cos(psi), va * np.sin(psi), self.g * np.tan(roll) / va])
 
     def simulate(self,
@@ -53,13 +53,13 @@ class Model:
         return time_points, states
 
 
-initial_state = np.array([0.0, 0.0, 0.0])
-time_span = (0, 100)
-Ts = 0.01
-va = 22
-roll = 0.4
+# initial_state = np.array([0.0, 0.0, 0.0])
+# time_span = (0, 100)
+# Ts = 0.01
+# va = 22
+# roll = 0.4
 
-uav = Model(Ts=Ts)
-time, states = uav.simulate(initial_state, va, roll, time_span)
+# uav = Model(Ts=Ts)
+# time, states = uav.simulate(initial_state, va, roll, time_span)
 
-save_to_mat("states.mat", time, states)
+# save_to_mat("states.mat", time, states)
