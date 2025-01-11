@@ -10,33 +10,18 @@ class GenerateTrajectory():
         self.dx = 3   # x, y, yaw
         self.du = 2   # air speed v, roll
 
-        self.umin = np.array([18, -0.43])
-        self.umax = np.array([25, 0.43])
+        self.umin = np.array([15, -0.8])
+        self.umax = np.array([30, 0.8])
 
         self.Nsim = Nsim  # final time in seconds
         self.t = np.arange(0, self.Nsim + Ts, Ts)
         
         self.coeffs = []
 
-    def _set_waypoints(self):
-        self.WPNum = 6
-        self.WPListState = [
-            np.array([0, 50, 100, np.pi / 6]),
-            np.array([10, 250, 200, np.pi / 6]),
-            np.array([20, 450, 300, np.pi / 6]),
-            np.array([30, 650, 400, np.pi / 6]),
-            np.array([40, 850, 500, np.pi / 6]),
-            np.array([50, 1050, 600, np.pi / 6]),
-        ]
-        
-        self.WPCommands = [
-            np.array([20, 0]),
-            np.array([20, 0]),
-            np.array([20, 0]),
-            np.array([20, 0]),
-            np.array([20, 0]),
-            np.array([20, 0]),
-        ]
+    def _set_waypoints(self, WpStates, WpCommands):
+        self.WPNum = len(WpStates)
+        self.WPListState = WpStates
+        self.WPCommands = WpCommands
 
 
     def _compute_coeffs(self):
@@ -72,8 +57,8 @@ class GenerateTrajectory():
 
             self.coeffs.append(np.linalg.solve(M, b))
 
-    def generate_trajectory(self):
-        self._set_waypoints()
+    def generate_trajectory(self, WpStates, WpCommands):
+        self._set_waypoints(WpStates, WpCommands)
         self._compute_coeffs()        
 
         z1 = lambda t, a: a[0] + a[1]*t + a[2]*t**2 + a[3]*t**3 + a[4]*t**4 + a[5]*t**5
@@ -113,6 +98,18 @@ class GenerateTrajectory():
     def plot_trajectories(self, x_ref, u_ref):
         figsize = (12, 6)
         padding = 2.5
+        
+        # Plot 2d
+        plt.figure(figsize=figsize)
+        plt.plot(x_ref[0, :], x_ref[1, :], "--r", label=f"ref")
+        plt.legend()
+        plt.ylabel(f"y")
+        plt.xlabel(f"x")
+        plt.grid(True)
+        for j in range(len(self.WPListState) - 1):
+            plt.stem([self.WPListState[j][1]], [self.WPListState[j][2]], linefmt='r-', markerfmt='ro', basefmt=' ')
+        plt.tight_layout(pad=padding)
+        plt.suptitle("States", fontsize=16)
         
         # Plot state trajectory
         plt.figure(figsize=figsize)

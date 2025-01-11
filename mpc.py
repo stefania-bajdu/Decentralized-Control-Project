@@ -4,28 +4,29 @@ import matplotlib.pyplot as plt
 
 
 class MPC_Controller:
-    def __init__(self, Ts, Nsim, xref, uref):
-        self._initialize_parameters(Ts, Nsim, xref, uref)
+    def __init__(self, Ts, Nsim, Npred, xref, uref):
+        self._initialize_parameters(Ts, Nsim, Npred, xref, uref)
         self.solver = cas.Opti()
         self._setup_solver()
 
-    def _initialize_parameters(self, Ts, Nsim, xref, uref):
+    def _initialize_parameters(self, Ts, Nsim, Npred, xref, uref):
         self.g = 9.81
 
         self.dx = 3     # x, y, yaw angle (heading)
         self.du = 2     # air speed v_a, roll angle
 
-        self.Npred = 10
+        self.Npred = Npred
         self.Nsim = Nsim
         self.Ts = Ts
 
-        self.umin = np.array([1, -1.04])
-        self.umax = np.array([25, 1.04])
+        self.umin = np.array([15, -0.8])
+        self.umax = np.array([30, 0.8])
         self.delta_umin = np.array([-0.1, -0.5]) / self.Ts
         self.delta_umax = np.array([0.2, 1.1]) / self.Ts
 
-        self.Q = np.diag([1, 1, 1])
-        self.R = np.diag([1, 1])
+        self.Q = np.diag([10, 10, 1])
+        self.Rdelta = np.diag([1, 1])
+        self.R = np.diag([1, 15])
         self.P = self.Q
 
         self.u_ref = uref
@@ -75,11 +76,11 @@ class MPC_Controller:
         for k in range(self.Npred):
             if k != 0:
                 objective += cas.mtimes([(x[:, k] - xref[:, k]).T, self.Q, (x[:, k] - xref[:, k])]) + \
-                    cas.mtimes([(u[:, k] - u[:, k - 1]).T, self.R, (u[:, k] - u[:, k - 1])]) + \
+                    cas.mtimes([(u[:, k] - u[:, k - 1]).T, self.Rdelta, (u[:, k] - u[:, k - 1])]) + \
                     cas.mtimes([(u[:, k] - uref[:, k]).T, self.R, (u[:, k] - uref[:, k])])
             else:
                 objective += cas.mtimes([(x[:, k] - xref[:, k]).T, self.Q, (x[:, k] - xref[:, k])]) + \
-                    cas.mtimes([(u[:, k] - uinit).T, self.R, (u[:, k] - uinit)]) + \
+                    cas.mtimes([(u[:, k] - uinit).T, self.Rdelta, (u[:, k] - uinit)]) + \
                     cas.mtimes([(u[:, k] - uref[:, k]).T, self.R, (u[:, k] - uref[:, k])])
 
         self.solver.minimize(objective)

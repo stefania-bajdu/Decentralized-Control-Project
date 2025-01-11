@@ -25,9 +25,22 @@ def plot_UAV_states(time, states):
     plt.show()
 
 
-def plot_states_with_references(time, xsim, usim, xref, uref):
+def plot_states_with_references(time, xsim, usim, xref, uref, Wp):
     figsize = (12, 6)
     padding = 2.5
+
+    # Plot 2d
+    plt.figure(figsize=figsize)
+    plt.plot(xsim[0, :], xsim[1, :], label="sim")
+    plt.plot(xref[0, :], xref[1, :], "--r", label=f"ref")
+    plt.legend()
+    plt.ylabel(f"y")
+    plt.xlabel(f"x")
+    plt.grid(True)
+    for j in range(len(Wp) - 1):
+        plt.stem([Wp[j][1]], [Wp[j][2]], linefmt='r-', markerfmt='ro', basefmt=' ')
+    plt.tight_layout(pad=padding)
+    plt.suptitle("States", fontsize=16)
 
     # Plot states
     plt.figure(figsize=figsize)
