@@ -33,7 +33,7 @@ def plot_states_with_references(time, xsim, usim, xref, uref):
     plt.figure(figsize=figsize)
     for i, (label, unit) in enumerate(zip(["x", "y", r"$\psi$"], ["(m)", "(m)", "(rad)"])):
         plt.subplot(3, 1, i + 1)
-        plt.plot(time, xsim[i, :-1], label=label)
+        plt.plot(time, xsim[i, :], label=label)
         plt.plot(time, xref[i, :], "--r", label=f"{label}_ref")
         plt.legend()
         plt.ylabel(f"{label} {unit}")

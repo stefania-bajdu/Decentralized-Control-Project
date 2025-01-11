@@ -104,23 +104,23 @@ class MPC_Controller:
 
         self.solver.set_initial(self.u, np.tile(self.u0, (self.Npred, 1)).T)
 
-        for i in range(self.Nsim):
+        for i in range(self.Nsim - self.Npred):
             self.solver.set_value(self.xinit, xsim[:, i])
             self.solver.set_value(self.uinit, usim_init)
 
             if i + self.Npred <= self.Nsim:
                 self.solver.set_value(self.solver_xref, self.x_ref[:, i: i + self.Npred])
                 self.solver.set_value(self.solver_uref, self.u_ref[:, i: i + self.Npred])
-            else:
-                remaining_refs = self.x_ref[:, i:]
-                padding_refs = np.tile(self.x_ref[:, -1:], (1, self.Npred - (self.Nsim - i)))
-                full_refs = np.hstack([remaining_refs, padding_refs])
-                self.solver.set_value(self.solver_xref, full_refs)
+            # else:
+            #     remaining_refs = self.x_ref[:, i:]
+            #     padding_refs = np.tile(self.x_ref[:, -1:], (1, self.Npred - (self.Nsim - i)))
+            #     full_refs = np.hstack([remaining_refs, padding_refs])
+            #     self.solver.set_value(self.solver_xref, full_refs)
 
-                remaining_refs = self.u_ref[:, i:]
-                padding_refs = np.tile(self.u_ref[:, -1:], (1, self.Npred - (self.Nsim - i)))
-                full_refs = np.hstack([remaining_refs, padding_refs])
-                self.solver.set_value(self.solver_uref, full_refs)
+            #     remaining_refs = self.u_ref[:, i:]
+            #     padding_refs = np.tile(self.u_ref[:, -1:], (1, self.Npred - (self.Nsim - i)))
+            #     full_refs = np.hstack([remaining_refs, padding_refs])
+            #     self.solver.set_value(self.solver_uref, full_refs)
 
             sol = self.solver.solve()
             usim[:, i] = sol.value(self.u)[:, 0]

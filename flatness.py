@@ -19,16 +19,18 @@ class GenerateTrajectory():
         self.coeffs = []
 
     def _set_waypoints(self):
-        self.WPNum = 5
+        self.WPNum = 6
         self.WPListState = [
             np.array([0, 50, 100, np.pi / 6]),
             np.array([10, 250, 200, np.pi / 6]),
             np.array([20, 450, 300, np.pi / 6]),
             np.array([30, 650, 400, np.pi / 6]),
             np.array([40, 850, 500, np.pi / 6]),
+            np.array([50, 1050, 600, np.pi / 6]),
         ]
         
         self.WPCommands = [
+            np.array([20, 0]),
             np.array([20, 0]),
             np.array([20, 0]),
             np.array([20, 0]),
