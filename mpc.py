@@ -1,6 +1,7 @@
 from utils import *
 import casadi as cas
 import matplotlib.pyplot as plt
+import time
 
 
 class MPC_Controller:
@@ -24,9 +25,9 @@ class MPC_Controller:
         self.delta_umin = np.array([-0.1, -0.5]) / self.Ts
         self.delta_umax = np.array([0.2, 1.1]) / self.Ts
 
-        self.Q = np.diag([10, 10, 1])
+        self.Q = np.diag([10, 10, 5])
         self.Rdelta = np.diag([1, 1])
-        self.R = np.diag([1, 15])
+        self.R = np.diag([1, 5])
         self.P = self.Q
 
         self.u_ref = uref
@@ -105,6 +106,7 @@ class MPC_Controller:
 
         self.solver.set_initial(self.u, np.tile(self.u0, (self.Npred, 1)).T)
 
+        start_time = time.time()
         for i in range(self.Nsim - self.Npred):
             self.solver.set_value(self.xinit, xsim[:, i])
             self.solver.set_value(self.uinit, usim_init)
@@ -130,4 +132,9 @@ class MPC_Controller:
 
             xsim[:, i + 1] = xsim[:, i] + self.Ts * self.f_dynamics(xsim[:, i], usim[:, i]).full().flatten()
 
+        execution_time = time.time() - start_time
+        execution_time_per_iteration = execution_time / (self.Nsim - self.Npred)
+        
+        print(f"Total execution time for the main loop: {execution_time:.4f} seconds")
+        print(f"Mean execution time per iteration: {execution_time_per_iteration:.4f} seconds")
         return xsim, usim
