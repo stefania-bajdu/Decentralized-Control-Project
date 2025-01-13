@@ -80,13 +80,13 @@ def simulate_linearized_with_remainder(linearized_systems, Ts):
     states[:, 0] = linearized_systems[0]['x0']
 
     for k in range(1, len(time_points)):
-        for i in range(1, len(linearized_systems)):
-            if linearized_systems[i-1]['time'] <= time_points[k] < linearized_systems[i]['time']:
-                system = linearized_systems[i-1]
-                break
-            # if time_points[k] > linearized_systems[-1]['time']:
-            #     system = linearized_systems[-1]
-            #     break
+        if time_points[k] >= linearized_systems[-1]['time']:
+                system = linearized_systems[-1]
+        else:
+            for i in range(1, len(linearized_systems)):
+                if linearized_systems[i-1]['time'] <= time_points[k] < linearized_systems[i]['time']:
+                    system = linearized_systems[i-1]
+                    break
 
         dx = states[:, k-1] - system['x0']
         du = system['u0']
@@ -105,8 +105,12 @@ def compare(time, xsim, usim):
     """Compare the linearized system response with the original system."""
     Ts = 0.1
     f = create_dynamics_function()
+    
+    # print(time)
+    
+    sparse_rate = 9
 
-    indices_to_linearize = np.arange(0, len(xsim[0]), 1)
+    indices_to_linearize = np.arange(0, len(xsim[0]), sparse_rate)
     linearized_systems = []
 
     for idx in indices_to_linearize:
@@ -132,7 +136,7 @@ def compare(time, xsim, usim):
     lin_response = simulate_linearized_with_remainder(linearized_systems, Ts)
 
     for i, label in enumerate(state_labels):
-        axs[i].plot(time, lin_response[i, :], label=f"Linearized (with remainder)", color="red")
+        axs[i].plot(time[0:-sparse_rate], lin_response[i, :], label=f"Linearized (with remainder)", color="red")
         axs[i].plot(time, xsim[i, :], label="Reference Trajectory", color="blue")
         axs[i].set_title(f"{label} Over Time")
         axs[i].set_xlabel("Time (s)")
