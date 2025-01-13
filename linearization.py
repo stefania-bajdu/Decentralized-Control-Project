@@ -72,9 +72,9 @@ def linearize_with_remainder(f, x0, u0):
     return A_at_x0_u0, B_at_x0_u0, taylor_remainder, f_at_x0_u0
 
 
-def simulate_linearized_with_remainder(linearized_systems, Ts):
+def simulate_linearized_with_remainder(startime, endtime, linearized_systems, Ts):
     """Simulate the linearized system including the Taylor remainder."""
-    time_points = np.arange(linearized_systems[0]['time'], linearized_systems[-1]['time'], Ts)
+    time_points = np.arange(startime, endtime, Ts)
 
     states = np.zeros((len(linearized_systems[0]['x0']), len(time_points)))
     states[:, 0] = linearized_systems[0]['x0']
@@ -106,9 +106,7 @@ def compare(time, xsim, usim):
     Ts = 0.1
     f = create_dynamics_function()
     
-    # print(time)
-    
-    sparse_rate = 9
+    sparse_rate = 5
 
     indices_to_linearize = np.arange(0, len(xsim[0]), sparse_rate)
     linearized_systems = []
@@ -116,7 +114,7 @@ def compare(time, xsim, usim):
     for idx in indices_to_linearize:
         x0 = xsim[:, idx]
         u0 = usim[:, idx]
-
+            
         A, B, remainder, f_at_x0_u0 = linearize_with_remainder(f, x0, u0)
 
         linearized_systems.append({
@@ -133,10 +131,10 @@ def compare(time, xsim, usim):
     fig, axs = plt.subplots(3, 1, figsize=(12, 6))
     state_labels = ["x (Position)", "y (Position)", "ψ (Yaw)"]
 
-    lin_response = simulate_linearized_with_remainder(linearized_systems, Ts)
+    lin_response = simulate_linearized_with_remainder(time[0], time[-1], linearized_systems, Ts)
 
     for i, label in enumerate(state_labels):
-        axs[i].plot(time[0:-sparse_rate], lin_response[i, :], label=f"Linearized (with remainder)", color="red")
+        axs[i].plot(time, lin_response[i, :], label=f"Linearized (with remainder)", color="red")
         axs[i].plot(time, xsim[i, :], label="Reference Trajectory", color="blue")
         axs[i].set_title(f"{label} Over Time")
         axs[i].set_xlabel("Time (s)")
