@@ -53,13 +53,14 @@ class Model:
         return time_points, states
 
 
-# initial_state = np.array([0.0, 0.0, 0.0])
-# time_span = (0, 100)
-# Ts = 0.01
-# va = 22
-# roll = 0.4
+if __name__ == "__main__":
+    initial_state = np.array([0.0, 0.0, 0.0])
+    time_span = (0, 100)
+    Ts = 0.01
+    va = 22
+    roll = 0
 
-# uav = Model(Ts=Ts)
-# time, states = uav.simulate(initial_state, va, roll, time_span)
+    uav = Model(Ts=Ts)
+    time, states = uav.simulate(initial_state, va, roll, time_span)
 
-# save_to_mat("states.mat", time, states)
+    save_to_mat("states.mat", time, states, "states")

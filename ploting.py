@@ -71,6 +71,6 @@ def plot_states_with_references(time, xsim, usim, xref, uref, Wp):
     plt.suptitle("Commands", fontsize=16)
     plt.show()
 
-
-# time, states = read_from_mat("states.mat")
-# plot_results(time, states)
+if __name__ == "__main__":
+    time, states = read_from_mat("states.mat", "states")
+    plot_UAV_states(time, states)
